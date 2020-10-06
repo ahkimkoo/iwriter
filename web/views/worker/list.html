@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>进程列表</title>
+        <%- include('../layout/common-css.html');%>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd">进程列表</h3>
+            </div>
+            <div class="am-panel-bd">
+                <div class="am-g" style="margin-left: 0;padding-left: 0;">
+                  <div class="am-u-sm-4" style="margin-left: 0;padding-left: 0;">
+                      当前有<em><%=workers.length%></em>进程在运行（进程可能运行在不同的机器上）
+                  </div>
+                  <div class="am-u-sm-8 am-text-right">
+                        <form class="am-form am-form-inline" method="POST" action="/worker/run">
+                        <div class="am-form-group">
+                            <select name="zone" id="zone" data-am-selected>
+                                <%
+                                    for(let z in zones){
+                                    if(zones.hasOwnProperty(z)){
+                                %>
+                                <option value="<%=z%>"><%=zones[z]%></option>
+                                <%}}%>
+                            </select>
+                        </div>
+                        
+                        <div class="am-form-group">
+                            <button type="submit" class="am-btn am-btn-primary am-radius">再运行一个</button>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+
+                <table class="am-table am-table-bordered am-table-radius am-table-striped am-table-hover" style="table-layout:fixed;">
+                    <tr>
+                        <th>分区</th>
+                        <th>主机</th>
+                        <th>进程</th>
+                        <th>持续存活</th>
+                        <th>最近活动</th>
+                        <th>地址</th>
+                        <th>日志</th>
+                        <th>终端</th>
+                        <th>停止</th>
+                    </tr>
+                    <%for(let w of workers){%>
+                    <tr>
+                        <td><%=w['zone']%></td>
+                        <td><%=w['host']%></td>
+                        <td><%=w['pid']%></td>
+                        <td><%=w['livetime']%></td>
+                        <td><%=w['checkin']%></td>
+                        <td><a href="<%=w['address']%>" target="_blank"><%=w['address']%></a></td>
+                        <td><a href="<%=w['own']?'':w['address']%>/worker/view/<%=w['_id']%>" class="am-btn am-btn-primary am-radius" target="_blank">查看</a></td>
+                        <td><a href="<%=w['own']?'':w['address']%>/worker/console" class="am-btn am-btn-primary am-radius" target="_blank">打开</a></td>
+                        <td><a href="<%=w['own']?'':w['address']%>/worker/kill/<%=w['_id']%>" onclick="javascript:if(!confirm('请不要随意杀死进程，你确定要这么做吗？'))return false;" target="<%=w['own']?'_self':'_blank'%>" class="am-btn am-btn-danger am-radius">停止</a></td>
+                    </tr>
+                    <%}%>
+                </table>
+
+            </div>
+            
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+</body>
+</html>

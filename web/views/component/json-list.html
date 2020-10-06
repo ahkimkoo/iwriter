@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><%=title%></title>
+        <%- include('../layout/common-css.html');%>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd"><%=title%>列表</h3>
+            </div>
+            <div class="am-panel-bd">
+                <div class="am-g" style="margin-left: 0;padding-left: 0;">
+                  <div class="am-u-sm-4" style="margin-left: 0;padding-left: 0;">
+                      <em><%=result['count']%></em>条记录&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="<%=uri_prefix%>edit" class="am-btn am-btn-lg am-btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增</a>
+                  </div>
+                  <div class="am-u-sm-8">
+                        <form class="am-form am-form-inline">
+                        <div class="am-form-group">
+                            <input type="text" name="keyword" class="am-form-field am-round"<%if(keyword){%> value="<%=keyword%>"<%}%> placeholder="请输入关键词查询"/>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="submit" class="am-btn am-btn-primary am-radius">查询</button>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+            </div>
+            <ul class="am-pagination">
+                <%if(result['pagenum']>0){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']-1)%>">上一页</a>
+                </li>
+                <%}%>
+                <%for(var i=result['page_min_num'];i<=result['page_max_num'];i++){%>
+                <li <%if(result['pagenum']===i){%>class="am-active"<%}%>>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=i%>"><%=i%></a>
+                </li>
+                <%}%>
+                <%if(result['pagenum'] < result['page_count']){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']+1)%>">下一页</a>
+                </li>
+                <%}%>
+            </ul>
+            <div>
+                <table class="am-table am-table-bordered am-table-radius am-table-striped am-table-hover" style="table-layout:fixed;">
+                <tr>
+                <%for(var i=0;i<primary_fields.length;i++){%>
+                    <th><%=primary_fields[i]['label']%></th>
+                    <%}%>
+                    <th>修改</th>
+                    <th>删除</th>
+                </tr>
+                <% result['list'].forEach(function(doc){ %>
+                <tr>
+                    <%for(var i=0;i<primary_fields.length;i++){%>
+                        <td><%=doc[primary_fields[i]['key']]%></td>
+                        <%}%>
+                        <td><a href="<%=uri_prefix%>edit?id=<%=doc['_id']%>">修改</a></td>
+                        <td><a href="javascript:if(confirm('Delete it, Are you serious？')){window.location.href='<%=uri_prefix%>remove?id=<%=doc['_id']%>';}">删除</a></td>
+                    </tr>
+                    <% }) %>
+                </table>
+            </div>
+            <ul class="am-pagination">
+                <%if(result['pagenum']>0){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']-1)%>">上一页</a>
+                </li>
+                <%}%>
+                <%for(var i=result['page_min_num'];i<=result['page_max_num'];i++){%>
+                <li <%if(result['pagenum']===i){%>class="am-active"<%}%>>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=i%>"><%=i%></a>
+                </li>
+                <%}%>
+                <%if(result['pagenum'] < result['page_count']){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']+1)%>">下一页</a>
+                </li>
+                <%}%>
+            </ul>
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+    </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><%=title%>列表</title>
+        <%- include('../layout/common-css.html');%>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd"><%=title%>列表</h3>
+            </div>
+            <div class="am-panel-bd">
+                <div class="am-g" style="margin-left: 0;padding-left: 0;">
+                  <div class="am-u-sm-4" style="margin-left: 0;padding-left: 0;">
+                      <em><%=result['count']%></em>条记录&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="<%=uri_prefix%>edit?category=<%=category%>" class="am-btn am-btn-lg am-btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增</a>
+                  </div>
+                  <div class="am-u-sm-8">
+                        <form class="am-form am-form-inline" method="get">
+                        <div class="am-form-group">
+
+                            <select name="category" id="category" data-am-selected>
+                                <optgroup label="不指定类别">
+                                    <option value="ALL">所有类别</option>
+                                </optgroup>
+                                <%for(let z of data_zone){%>
+                                  <optgroup label="<%=z['name']%>">
+                                    <%for(let c of z['categories']){%>
+                                        <option value="<%=c%>" <%if(category==c){%> selected<%}%>><%=c%></option>
+                                    <%}%>
+                                  </optgroup>
+                                <%}%>
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <input type="text" name="keyword" class="am-form-field am-round"<%if(keyword){%> value="<%=keyword%>"<%}%> placeholder="请输入关键词查询"/>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="submit" class="am-btn am-btn-primary am-radius">查询</button>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+            </div>
+            <ul class="am-pagination">
+                <%if(result['pagenum']>0){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']-1)%>&category=<%=category%>">上一页</a>
+                </li>
+                <%}%>
+                <%for(var i=result['page_min_num'];i<=result['page_max_num'];i++){%>
+                <li <%if(result['pagenum']===i){%>class="am-active"<%}%>>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=i%>&category=<%=category%>"><%=i%></a>
+                </li>
+                <%}%>
+                <%if(result['pagenum'] < result['page_count']){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']+1)%>&category=<%=category%>">下一页</a>
+                </li>
+                <%}%>
+            </ul>
+            <div>
+                <table class="am-table am-table-bordered am-table-radius am-table-striped am-table-hover" style="table-layout:fixed;">
+                <tr>
+                    <th>名称</th>
+                    <th>类别</th>
+                    <th>调度周期</th>
+                    <th>最近调度</th>
+                    <th>错误数</th>
+                    <th>代码变更</th>
+                    <th>有效</th>
+                    <th colspan="4">编辑</th>
+                    <th colspan="2">运行</th>
+                </tr>
+                <% result['list'].forEach(function(doc){ %>
+                <tr>
+
+                        <td><%=doc['name']%></td>
+                        <td><%=doc['category']%></td>
+                        <td><%=doc['schedule_peroid_des']%></td>
+                        <td><%=doc['last_schecule_des']%></td>
+                        <td><%=doc['error_count']%></td>
+                        <td><%=doc['code_changed']?'有':'-'%></td>
+                        <td><i class="am-icon-<%=doc['valid'] === true?'check':'times'%> am-text-warning"></i></td>
+                        <td><a href="<%=uri_prefix%>edit?id=<%=doc['_id']%>">修改信息</a></td>
+                        <td><a href="<%=uri_prefix%>code?id=<%=doc['_id']%>" target="_blank">编写代码</a></td>
+                        <td><a href="<%=uri_prefix%>clone?id=<%=doc['_id']%>" target="_self">克隆规则</a></td>
+                        <td>
+							<%if(doc['valid']){%>
+                        		<a href="javascript:if(confirm('你真的要置为无效吗？')){window.location.href='<%=uri_prefix%>trash?id=<%=doc['_id']%>';}">关闭</a>
+							<%}else{%>
+								<a href="javascript:if(confirm('你真的要删除吗？')){window.location.href='<%=uri_prefix%>delete?id=<%=doc['_id']%>';}">删除</a>
+							<%}%>
+                        </td>
+                        <td><a href="<%=uri_prefix%>forcerun?id=<%=doc['_id']%>" target="_self">强制运行</a></td>
+                        <td><a href="/datas/view/<%=doc['_id']%>?name=<%=doc['name']%>&category=<%=doc['category']%>" target="_blank">历史数据</a></td>
+                    </tr>
+                    <% }) %>
+                </table>
+            </div>
+            <ul class="am-pagination">
+                <%if(result['pagenum']>0){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']-1)%>&category=<%=category%>">上一页</a>
+                </li>
+                <%}%>
+                <%for(var i=result['page_min_num'];i<=result['page_max_num'];i++){%>
+                <li <%if(result['pagenum']===i){%>class="am-active"<%}%>>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=i%>&category=<%=category%>"><%=i%></a>
+                </li>
+                <%}%>
+                <%if(result['pagenum'] < result['page_count']){%>
+                <li>
+                    <a href="<%=uri_prefix%>list?pagenum=<%=(result['pagenum']+1)%>&category=<%=category%>">下一页</a>
+                </li>
+                <%}%>
+            </ul>
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+</body>
+</html>

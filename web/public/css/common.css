@@ -1,0 +1,87 @@
+.am-topbar{
+	margin-bottom: 0; 
+}
+.user-box{
+    background: none;
+    text-align: center;
+    padding: 30px 0px 20px 0px;
+}
+.user-box .user-img{
+    width: 4rem;
+    height: 4rem;
+    position: relative;
+    margin: 0px auto;
+}
+.user-box .user-status{
+    width: 0.1rem;
+    height: 0.1rem;
+    bottom: 1.8rem;
+    right: 1.4rem;
+    position: absolute;
+}
+h5.nickname{
+    margin-top: 1.7rem;
+    color: #c5c8cc
+}
+.img-thumbnail{
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    padding: 4px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    border-radius: 50%;
+}
+
+.user-box .user-status.offline i{
+    color: #ff5b5b;
+}
+
+.user-box .user-status i{
+    font-size: 15px;
+}
+
+#editor{
+    /*font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,Arial, sans-serif;*/
+    line-height: 18px;
+}
+
+.am-nav a>i{
+    margin-right: 0.3rem;
+}
+
+.des table {
+    /*width: 100%;*/
+    font-family: verdana,arial,sans-serif;
+    font-size:1.2rem;
+    color:#333333;
+    border-width: 0.1rem;
+    border-color: #666666;
+    border-collapse: collapse;
+    margin: auto;
+}
+
+.des table th {
+    border-width: 0.1rem;
+    padding: 0.5rem;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
+}
+
+.des table td {
+    border-width: 0.1rem;
+    padding: 0.5px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+}
+
+.hide{
+    display: none;
+}

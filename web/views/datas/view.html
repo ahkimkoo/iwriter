@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>【<%=category%>】<%=name%>历史记录</title>
+        <%- include('../layout/common-css.html');%>
+        <link rel="stylesheet" type="text/css" href="/amazeui/css/amazeui.toast.css">
+        <style type="text/css">
+            .btn{
+                cursor: pointer;
+            } 
+        </style>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd">【<%=category%>】<%=name%>历史记录</h3>
+            </div>
+            <div class="am-panel-bd">
+                <div class="am-g" style="margin-left: 0;padding-left: 0;">
+                    <div class="am-fl">
+                        <em><%=result['count']%></em>条记录，<%=peroid%>更新
+                    </div>
+                    <div class="am-fr">
+                        <a href="<%=uri_prefix%>forcerun?rule=<%=rule%>&name=<%=name%>&category=<%=category%>" class="am-btn am-btn-lg am-btn-danger"><i class="am-icon-flash"></i>手动执行</a>
+                        <a href="/rules/edit?id=<%=rule%>" target="_blank" class="am-btn am-btn-lg am-btn-primary"><i class="am-icon-edit"></i>修改规则</a>
+                        <a href="/rules/code?id=<%=rule%>" target="_blank" class="am-btn am-btn-lg am-btn-warning"><i class="am-icon-bug"></i>编写代码</a>
+                    </div>
+                    <div class="am-cf"></div>
+                </div>
+
+                <!-- <ul class="am-avg-sm-1 am-avg-md-2 am-avg-lg-3" style="margin-top: 2rem;"> -->
+                <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-1" style="margin-top: 2rem;">
+                    <%for(let d of result['list']){%>
+                    <li style="padding: 1rem;">
+                        <div class="am-panel am-panel-warning">
+                          <div class="am-panel-hd">
+                            <div class="am-fl">
+                            <strong><i class="am-icon-vimeo" style="margin-right: 0.3rem;"></i><%=d['version']%></strong>
+                            </div>
+                            <div class="am-fr">
+                                <i class="btn am-icon-copy am-text-primary"><textarea class="hide"><%-d['show']||d['message']%></textarea></i>
+                            </div>
+                            <div class="am-cf"></div>
+                          </div>
+                          <div class="am-panel-bd">
+                            <div class="des"><%-d['show']||d['message'].replace(/\n/ig,'<br/>')%></div>
+                            
+                            <%if(d['values']){%>
+                            <ul class="am-list">
+                                <%for(let k in d['values']){%>
+                                    <li><span style="font-weight: bold;"><%=k%></span> <i class="am-icon-long-arrow-right"></i> <%=d['values'][k]%></li>
+                                <%}%>
+                            </ul>
+                            <%}%>
+
+                          </div>
+                          <div class="am-panel-footer">
+                                <div class="am-fl am-text-xs">
+                                    
+                                </div>
+                                <div class="am-fr am-text-xs">
+                                    <i class="am-icon-calendar-check-o" style="margin-right: 0.3rem;"></i><%=getAppropiateDateDescription(d['updated'])%>（<%=dateFormat(d['updated'],'yyyy-MM-dd hh:mm:ss')%>）
+                                </div>
+                                <div class="am-cf"></div>
+                          </div>
+                        </div>
+                    </li>
+                    <%}%>
+                </ul>
+                <ul class="am-pagination">
+                    <%if(result['pagenum']>0){%>
+                    <li>
+                        <a href="<%=uri_prefix%>view/<%=rule%>?name=<%=name%>&category=<%=category%>&pagenum=<%=(result['pagenum']-1)%>">上一页</a>
+                    </li>
+                    <%}%>
+                    <%for(var i=result['page_min_num'];i<=result['page_max_num'];i++){%>
+                    <li <%if(result['pagenum']===i){%>class="am-active"<%}%>>
+                        <a href="<%=uri_prefix%>view/<%=rule%>?name=<%=name%>&category=<%=category%>&pagenum=<%=i%>"><%=i%></a>
+                    </li>
+                    <%}%>
+                    <%if(result['pagenum'] < result['page_count']){%>
+                    <li>
+                        <a href="<%=uri_prefix%>view/<%=rule%>?name=<%=name%>&category=<%=category%>&pagenum=<%=(result['pagenum']+1)%>">下一页</a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+                
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+        <script type="text/javascript" src="/amazeui/js/amazeui.toast.js"></script>
+        <script type="text/javascript" src="/js/clipboard.min.js"></script>
+        <script type="text/javascript">
+            var clipboard = new ClipboardJS('.btn',{
+                text: function(trigger) {
+                    return trigger.querySelector('textarea').value;
+                }
+            });
+            clipboard.on('success', function(e) {
+                e.clearSelection();
+
+                $('body').toast({
+                    text: '复制好了，去粘贴吧！',
+                    duration: 1000,
+                    type:'success'
+                });
+            });
+        </script>
+</body>
+</html>

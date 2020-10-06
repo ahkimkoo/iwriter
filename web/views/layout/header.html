@@ -1,0 +1,66 @@
+<header class="am-topbar">
+  <h1 class="am-topbar-brand">
+  <strong>聚合写作<i class="am-icon-opencart"></i></strong>
+  </h1>
+  <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#doc-topbar-collapse'}"><span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span></button>
+  <div class="am-collapse am-topbar-collapse" id="doc-topbar-collapse">
+    <ul class="am-nav am-nav-pills am-topbar-nav">
+
+      <li class="am-dropdown" data-am-dropdown>
+        <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:;" <%if(pos=='profile'){%> style="color:#3bb4f2;"<%}%>>
+          <i class="am-icon-tv"></i>个人中心<span class="am-icon-caret-down"></span>
+        </a>
+        <ul class="am-dropdown-content">
+          <li><a href="/profile/subscribe/list"><i class="am-icon-shopping-cart"></i>我的订阅</a></li>
+          <li><a href="/profile/subscribe/add"><i class="am-icon-cart-plus"></i>添加订阅</a></li>
+          <li><a href="/profile/subscribe/list?edit=y"><i class="am-icon-cart-arrow-down"></i>删除订阅</a></li>
+          <li><a href="/profile/subscribe/list?edit=y&category=ALL"><i class="am-icon-sort-numeric-asc"></i>订阅排序</a></li>
+          <li class="am-divider"></li>
+          <li><a href="/profile/change-password"><i class="am-icon-key"></i>修改密码</a></li>
+          <!-- <li><a href="/profile/logout">退出登录</a></li> -->
+        </ul>
+      </li>
+
+      <li<%if(pos=='datas'){%> class="am-active"<%}%>><a href="/datas/list"><i class="am-icon-mixcloud"></i>数据广场</a></li>
+
+      <li class="am-dropdown" data-am-dropdown>
+        <a class="am-dropdown-toggle" data-am-dropdown-toggle  <%if(pos=='rules' || pos=='worker'){%> style="color:#3bb4f2;"<%}%>>
+          <i class="am-icon-forumbee"></i>数据工厂<span class="am-icon-caret-down"></span>
+        </a>
+        <ul class="am-dropdown-content">
+          <li><a href="/rules/list"><i class="am-icon-ioxhost"></i>数据规则</a></li>
+          <li class="am-divider"></li>
+          <li><a href="/rules/wiki/view/API"><i class="am-icon-book"></i>编程帮助</a></li>
+          <li class="am-divider"></li>
+          <li><a href="/worker/list"><i class="am-icon-server"></i>调度进程</a></li>
+          <li><a href="/worker/console"><i class="am-icon-terminal"></i>服务终端</a></li>
+          <li class="am-divider"></li>
+          <li><a href="/provider/try"><i class="am-icon-bug"></i>接口调试</a></li>
+        </ul>
+      </li>
+
+      <li class="am-dropdown" data-am-dropdown>
+        <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:;" <%if(pos=='admin' || pos=='config'){%> style="color:#3bb4f2;"<%}%>>
+          <i class="am-icon-gears"></i>高级设置<span class="am-icon-caret-down"></span>
+        </a>
+        <ul class="am-dropdown-content">
+          <li><a href="/admin/manager/list"><i class="am-icon-user-secret"></i>管理员设置</a></li>
+          <li><a href="/admin/manager-group-list"><i class="am-icon-expeditedssl"></i>权限组设置</a></li>
+          <li class="am-divider"></li>
+          <li><a href="/config/list"><i class="am-icon-gg"></i>动态配置文件</a></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="am-topbar-right">
+      <h5 class="nickname"><%=nickname%></h5>
+    </div>
+    <div class="am-topbar-right">
+      <div class="user-box am-hide-sm-only" style="padding: 10px 0">
+        <div class="user-img">
+          <img src="<%=avatar%>" alt="user-img" title="<%=nickname%>" class="img-circle img-thumbnail img-responsive">
+          <div class="user-status offline"><i class="am-icon-dot-circle-o" aria-hidden="true"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

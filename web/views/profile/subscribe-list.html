@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>我的数据</title>
+        <%- include('../layout/common-css.html');%>
+        <link rel="stylesheet" type="text/css" href="/amazeui/css/amazeui.toast.css">
+        <style type="text/css">
+            .btn{
+                cursor: pointer;
+            }
+            .des{
+                width: 100%;
+                height: 15rem;
+                overflow:auto;
+            }
+        </style>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd"><%=edit?'编辑订阅':'我的订阅'%>（分类：<%if(category=='SOME'){%>精选<%}else if(!category ||　category=='ALL'){%>所有<%}else{%><%=category%><%}%>）</h3>
+            </div>
+            <div class="am-panel-bd">
+                <div class="am-g" style="margin-left: 0;padding-left: 0;">
+                  <div class="am-u-sm-2" style="margin-left: 0;padding-left: 0;">
+                      <em><%=results.length%></em>条记录
+                  </div>
+                  <div class="am-u-sm-5">
+                        <form class="am-form am-form-inline" method="GET">
+                        <input type="hidden" name="edit" value="<%=edit%>">
+                        <div class="am-form-group">
+                            <select name="category" id="category" data-am-selected>
+                                <optgroup label="所有类别">
+                                    <option value="ALL" <%if(category=='ALL'){%> selected<%}%>>所有</option>
+                                    <option value="SOME" <%if(category=='SOME'){%> selected<%}%>>精选</option>
+                                </optgroup>
+                                <%for(let z of data_zone){%>
+                                  <optgroup label="<%=z['name']%>">
+                                    <%for(let c of z['categories']){%>
+                                        <option value="<%=c%>" <%if(category==c){%> selected<%}%>><%=c%></option>
+                                    <%}%>
+                                  </optgroup>
+                                <%}%>
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <input type="text" name="keyword" class="am-form-field am-round"<%if(keyword){%> value="<%=keyword%>"<%}%> placeholder="请输入关键词查询"/>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="submit" class="am-btn am-btn-primary am-radius">查询</button>
+                        </div>
+                    </form>
+                  </div>
+                  <div class="am-u-sm-5  am-text-right">
+                    <%if(edit){%>
+                        <a href="list" class="am-btn am-btn-success am-radius"><i class="am-icon-eye">查看订阅</i></a>
+                    <%}else{%>
+                      <a href="add" class="am-btn am-btn-success am-radius"><i class="am-icon-plus">添加订阅</i></a>
+                      <a href="?edit=y" class="am-btn am-btn-danger am-radius"><i class="am-icon-remove">删除订阅</i></a>
+                      <a href="?edit=y&category=ALL" class="am-btn am-btn-primary am-radius"><i class="am-icon-sort-numeric-asc">订阅排序</i></a>
+                    <%}%>
+                      <a href="javascript:refreshall()" class="am-btn am-btn-warning am-radius"><i class="am-icon-refresh">刷新全部</i></a>
+                  </div>
+                </div>
+
+                <ul class="am-avg-sm-1 am-avg-md-2 am-avg-lg-3" style="margin-top: 2rem;" id="slist">
+                    <%for(let d of results){%>
+                    <li style="padding: 1rem;" id="p_<%=d['rule']%>" data-id="<%=d['rule']%>">
+                        <div class="am-panel am-panel-warning">
+                          <div class="am-panel-hd">
+                            <div class="am-fl"><strong><%=d['name']%></strong><%if(!category || category == 'ALL' ||  category == 'SOME'){%>【<%=d['category']%>】<%}%></div>
+                            <div class="am-fr">
+                                <%if(edit){%>
+                                    <a href="javascript:removeFav('<%=d['rule']%>')" target="_self"><i class="am-icon-trash">删除</i></a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <%}%>
+                                <a href="/datas/view/<%=d['rule']%>?name=<%=d['name']%>&category=<%=d['category']%>" target="_blank"><i class="am-icon-external-link"></i></a>
+                            </div>
+                            <div class="am-cf"></div>
+                          </div>
+                          <div class="am-panel-bd">
+                            <div class="des"><%-d['show']||d['message'].replace(/\n/ig,'<br/>')%></div>
+                            <%if(d['values']){%>
+                                <div class="am-comment-meta"><%-JSON.stringify(d['values'])%></div>
+                            <%}%>
+                            <div class="am-fr">
+                                <i class="btn am-icon-copy am-text-primary"><textarea class="hide"><%-d['show']||d['message']%></textarea></i>
+                            </div>
+                            <div class="am-cf"></div>
+                          </div>
+                          <div class="am-panel-footer">
+                                <div class="am-fl am-text-xs">
+                                    <i class="am-icon-vimeo" style="margin-right: 0.3rem;"></i><%=d['version']%>
+                                </div>
+                                <div class="am-fr am-text-xs">
+                                    <i class="am-icon-calendar-check-o" style="margin-right: 0.3rem;"></i><%=d['updated_des']%>
+                                </div>
+                                <div class="am-cf"></div>
+                          </div>
+                        </div>
+                    </li>
+                    <%}%>
+
+                </ul>
+
+            </div>
+            
+        </div>
+    
+        <!--modal start-->
+        <div class="am-modal am-modal-confirm" tabindex="-1" id="my-confirm">
+          <div class="am-modal-dialog">
+            <div class="am-modal-hd">该操作需谨慎</div>
+            <div class="am-modal-bd">
+              <p>该操作将批量强制刷新所有订阅的数据项</p>
+              <p>批量强制刷新会导致一些有严格周期限制的数据产生错误，从而影响到其他订阅此项数据的用户，强烈建议不要进行此操作，建议在有必要的情况下单独刷新每个数据项</p>
+              <p style="color: red;">由于批量强制刷新导致数据错误，影响其他人使用订阅数据，由操作者承担所有后果！！！</p>
+            </div>
+            <div class="am-modal-footer">
+              <span class="am-modal-btn" data-am-modal-cancel>算求，不弄了</span>
+              <span class="am-modal-btn" data-am-modal-confirm>不怕，出事我来扛</span>
+            </div>
+          </div>
+        </div>
+        <!--modal end-->
+
+        <%- include('../layout/bottom-js.html');%>
+        <script type="text/javascript" src="/amazeui/js/amazeui.toast.js"></script>
+        <script type="text/javascript" src="/js/clipboard.min.js"></script>
+        <%if(edit && category=='ALL'){%>
+            <script type="text/javascript" src="/js/Sortable.js"></script>
+        <%}%>
+        <script type="text/javascript">
+            var removeFav = function(id){
+                if(confirm('真的想好了要删除？')){
+                    $.ajax({
+                        method: "POST",
+                        url: "delete",
+                        data: { 'id':id }
+                      })
+                      .done(function(msg) {
+                        if(msg.success && msg.add){
+                            $('body').toast({
+                                text: '删除订阅成功',
+                                duration: 1000,
+                                type:'success'
+                            });
+                            $('#p_'+id).fadeOut();
+                        }else {
+                            $('body').toast({
+                                text: '删除订阅失败',
+                                duration: 1000,
+                                type:'success'
+                            });
+                        }
+                      });
+                }
+            }
+
+            $(function(){
+                var clipboard = new ClipboardJS('.btn',{
+                text: function(trigger) {
+                    return trigger.querySelector('textarea').value;
+                }
+            });
+                clipboard.on('success', function(e) {
+                    // console.info('Action:', e.action);
+                    // console.info('Text:', e.text);
+                    // console.info('Trigger:', e.trigger);
+
+                    e.clearSelection();
+
+                    $('body').toast({
+                        text: '复制好了，去粘贴吧！',
+                        duration: 1000,
+                        type:'success'
+                    });
+                });
+
+                // clipboard.on('error', function(e) {
+                //     console.error('Action:', e.action);
+                //     console.error('Trigger:', e.trigger);
+                // });
+                // 
+
+                <%if(edit && category=='ALL'){%>
+                var sortable;
+                var sortFav = function(evt){
+                    $.ajax({
+                        method: "POST",
+                        url: "sort",
+                        data: {'series': sortable.toArray()}
+                      })
+                      .done(function(msg) {
+                        if(msg.success && msg.add){
+                            $('body').toast({
+                                text: '排序已提交成功',
+                                duration: 1000,
+                                type:'success'
+                            });
+                        }else {
+                            $('body').toast({
+                                text: '排序提交失败',
+                                duration: 1000,
+                                type:'success'
+                            });
+                        }
+                      });
+                }
+
+                var container = document.getElementById('slist');
+                sortable = Sortable.create(
+                    container,
+                    { 
+                        group : "omega",
+                        dataIdAttr : 'data-id',
+                        onUpdate: sortFav
+                    });
+
+                $('body').toast({
+                    text: '拖动数据进行排序',
+                    duration: 3000,
+                    type:'success'
+                });
+                <%}%>
+            }); 
+
+            var gorefresh = function(){
+                $('#slist>li').each(function() {
+                    var self = $(this);
+                    var rule = self.attr('data-id');
+                    self.find('.am-panel-bd>.des').html('正在刷新...<i class="am-icon-spinner am-icon-pulse"></i>');
+                    self.find('.am-panel-bd>.am-comment-meta').remove();
+                    $.ajax({
+                        method: "GET",
+                        url: "/datas/refresh?rule="+rule
+                      })
+                      .done(function(d) {
+                        if(d){
+                            self.find('.am-panel-bd>.des').html(d['show']||d['message'].replace(/\n/ig,'<br/>'));
+                            if(d['values'])self.find('.am-panel-bd>.des').after('<div class="am-comment-meta">'+JSON.stringify(d['values'])+'</div>');
+                            self.find('.am-panel-footer>.am-fl').html('<i class="am-icon-vimeo" style="margin-right: 0.3rem;"></i>'+d['version']);
+                            self.find('.am-panel-footer>.am-fr').html('<i class="am-icon-calendar-check-o" style="margin-right: 0.3rem;"></i>'+d['updated_des']);
+                        }else {
+                            self.find('.am-panel-bd>.des').html('刷新失败');
+                        }
+                      });
+                });
+            }
+
+            var refreshall = function(){
+                $('#my-confirm').modal({
+                relatedTarget: this,
+                onConfirm: function(options) {
+                  gorefresh();
+                },
+                // closeOnConfirm: false,
+                onCancel: function() {
+                    $('body').toast({
+                        text: '你做了明智的选择',
+                        duration: 2000,
+                        type:'success'
+                    });
+                }
+              });
+            }
+
+
+        </script>
+</body>
+</html>

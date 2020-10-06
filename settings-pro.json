@@ -1,0 +1,35 @@
+{
+    "project_name": "聚合写作",
+    "mongo_connect_url": "mongodb://prod:27017/iwriter",
+    "mongo_pool_size": 5,
+
+    "gritty_prefix": "/worker/console",
+
+    "qiniu": {
+        "accessKey": "accessKey",
+        "secretKey": "secretKey",
+        "bucket_origin": {
+            "feweb": "http://qn.domain.com"
+        }
+    },
+
+    "log_level": "DEBUG",
+    "log_appender": 111,
+    "check_worker": false,
+    "check_worker_mail_receiver": ["Checker <checker@mail.com>"],
+    "check_worker_mail_sender": ["Support <support@mail.com>"],
+    "check_worker_wechat_receiver": "运维报告",
+    "mail_config": {
+        "host": "smtp.exmail.qq.com",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "user": "support@mail.com",
+            "pass": "password"
+        }
+    },
+    "check_worker_mq_config":{
+        "connect_url": "amqp://user:pwd@mq-host:5672/host",
+        "exchange": "iw_ex"
+    }
+}

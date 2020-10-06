@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feheadline Admin</title>
+    <%- include('./layout/common-css.html');%>
+</head>
+<body>
+<!-- Begin page -->
+<header class="am-topbar am-topbar-fixed-top">
+    <div class="am-topbar-left am-hide-sm-only">
+        <a href="index.html" class="logo"><span>Fe<span>Admin</span></span><i class="zmdi zmdi-layers"></i></a>
+    </div>
+
+    <div class="contain">
+        <ul class="am-nav am-navbar-nav am-navbar-left">
+            <li><h4 class="page-title">操作结果</h4></li>
+        </ul>
+    </div>
+</header>
+<!-- end page -->
+<div class="admin">
+    <%- include('./layout/left-sidebar.html'); %>
+    <!-- Start right Content here -->
+    <div class="content-page">
+
+        <div class="am-text-center">
+            <h2><%= result[1] %></h2>
+        </div>
+    </div>
+    <!-- end right Content here -->
+</div>
+
+<%- include('./layout/bottom-navbar.html');%>
+<%- include('./layout/bottom-js.html');%>
+<script>
+    if ('<%= result[0] %>' == 'true') {
+        setTimeout(() => {
+            location.replace('<%= result[2] %>');
+        }, 500)
+    }
+</script>
+</body>
+</html>

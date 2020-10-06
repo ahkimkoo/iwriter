@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>编辑<%=doc['name']%>代码</title>
+        <%- include('../layout/common-css.html');%>
+        <link rel="stylesheet" href="/amazeui/css/amazeui.datetimepicker.css" />
+        <style type="text/css" media="screen">
+            #editor { 
+                width: 100%;
+                height: 60rem;
+                font-size: 1.6rem;
+            }
+            .am-panel-bd{
+              padding:0.25rem;
+            }
+            #debug_msg{
+              width: 100%;
+              height: auto;
+              color: #FF3232;
+            }
+        </style>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd">编写代码：【<%=doc['category']%>】<%=doc['name']%></h3>
+            </div>
+            <div class="am-panel-bd">
+                <form method="post" class="am-form">
+                  <div class="am-form-group">
+                      <div id="editor"></div>
+                  </div>
+                  <div class="am-form-group am-form-inline">
+                    <button type="button" class="am-btn am-btn-success am-btn-sm" onclick="javascript:save_dev_code_manually()"><i class="am-icon-save"></i>保存代码</button>
+                    <button type="button" class="am-btn am-btn-warning am-btn-sm" onclick="javascript:debug_dev_code()"><i class="am-icon-bug"></i>调试运行</button>
+                    <div class="am-dropdown" data-am-dropdown id="vmdn">
+                        <button class="am-btn am-btn-primary am-btn-sm am-dropdown-toggle" data-am-dropdown-toggle><i class="am-icon-cloud-download"></i>版本管理 <span class="am-icon-caret-down"></span></button>
+                        <ul class="am-dropdown-content">
+                          <li class="am-dropdown-header">载入不同的代码版本</li>
+                          <li><a href="javascript:load_dev_code()">测试代码</a></li>
+                          <li><a href="javascript:load_pro_code()">生产代码（不可编辑）</a></li>
+                          <li class="am-divider"></li>
+                          <li class="am-dropdown-header">将测试代码发布生产</li>
+                          <li><a href="javascript:publish_code()">发布代码</a></li>
+                        </ul>
+                      </div>
+                      <a href="/rules/wiki/view/API" target="_blank" class="am-btn am-btn-primary am-btn-sm"><i class="am-icon-book"></i>帮助文档</a>
+                  </div>
+                </form>
+            </div>
+            <div id="initial_code_values" style="display: none;">
+              <textarea id="initial_dev_code"><%-doc['dev_code']||''%></textarea>
+              <textarea id="initial_pro_code"><%-doc['code']||''%></textarea>
+            </div>
+            <div class="am-alert am-alert-secondary" data-am-alert>
+              <textarea class="am-alert am-alert-secondary" id="debug_msg" readonly="readonly"></textarea>
+            </div>
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+        <script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            var showMessage = function(msg){
+              var now = new Date();
+              document.getElementById('debug_msg').value = now.getHours()+':'+now.getMinutes()+':'+now.getSeconds()+' > '+msg;
+              document.getElementById('debug_msg').style.height = document.getElementById('debug_msg').scrollHeight + 'px';
+            }
+
+            var dev_code = '';
+            var pro_code = '';
+            var coding_mode = true;
+            var dev_code_changed = false;
+            var editor,dev_session,pro_session;
+
+            var load_pro_code = function(){
+              $('#vmdn').dropdown('close');
+               if(coding_mode){
+                  editor.setTheme("ace/theme/dreamweaver");
+                  dev_code = dev_session.getValue();
+                  editor.setSession(pro_session);
+                  editor.setReadOnly(true);
+                  coding_mode = false;
+               }
+            }
+
+            var load_dev_code = function(){
+              $('#vmdn').dropdown('close');
+               if(!coding_mode){
+                  editor.setTheme("ace/theme/twilight");
+                  editor.setSession(dev_session);
+                  editor.setReadOnly(false);
+                  coding_mode = true;
+               }
+            }
+
+            var save_dev_code = function(callback){
+              $.ajax({
+                method: "POST",
+                url: "putcode",
+                data: { 'id':'<%=id%>', 'dev_code': dev_code }
+              })
+              .done(function(msg) {
+                dev_code_changed = false;
+                if(callback)callback();
+              });
+            }
+
+            var publish_code = function(){
+              $('#vmdn').dropdown('close');
+              if(confirm('要将测试代码发布使用吗？')){
+                $.ajax({
+                  method: "POST",
+                  url: "publishcode",
+                  data: { 'id':'<%=id%>', 'dev_code': dev_code }
+                })
+                .done(function(msg) {
+                  dev_code_changed = false;
+                  pro_session.setValue(dev_code);
+                  pro_code = dev_code;
+                  showMessage('已将测试代码发布到生产环境！');
+                });
+              }
+            }
+
+            var debug_dev_code = function(callback){
+              if(dev_code_changed){
+                   save_dev_code_manually(true);
+              }
+              showMessage('代码正在调试运行，请稍候...');
+              $.ajax({
+                method: "POST",
+                url: "debugcode",
+                data: { 'id':'<%=id%>', 'dev_code': dev_code }
+              })
+              .done(function(msg) {
+                if(msg.success)showMessage('代码运行结果: \n'+JSON.stringify(msg.result,null,4));
+                else showMessage('代码运行错误：\n' + msg.result.toString());
+                if(callback)callback();
+              });
+            }
+
+            var save_dev_code_manually = function(silent){
+              save_dev_code(function(msg){
+                if(!silent)showMessage('最新代码已保存');
+              });
+            }
+
+          window.addEventListener("beforeunload", function (e) {
+            if(dev_code_changed){
+              var confirmationMessage = "\o/";
+              (e || window.event).returnValue = confirmationMessage;     // Gecko and Trident
+              return confirmationMessage;                                // Gecko and WebKit
+            }
+          });
+
+          $(function(){
+              dev_code = document.getElementById('initial_dev_code').value;
+              pro_code = document.getElementById('initial_pro_code').value;
+
+              editor = ace.edit("editor");
+              editor.setTheme("ace/theme/twilight");
+              editor.setHighlightActiveLine(false);
+
+              var EditSession = require("ace/edit_session").EditSession;
+              dev_session = new EditSession(dev_code, "ace/mode/javascript");
+              pro_session = new EditSession(['/*********正式代码，不可编辑********/',pro_code], "ace/mode/javascript");
+
+              dev_session.setUseWrapMode(true);
+              pro_session.setUseWrapMode(true);
+
+              dev_session.setValue(dev_code);
+              pro_session.setValue(pro_code);
+
+              editor.setSession(dev_session);
+
+              // editor.getSession().setMode("ace/mode/javascript");
+              // editor.getSession().setUseWrapMode(true); 
+
+              dev_session.on('change',function(changed){
+                dev_code = dev_session.getValue();
+                dev_code_changed = true;
+              });
+
+              editor.commands.addCommand({
+                  name: 'saveFile',
+                  bindKey: {
+                    win: 'Ctrl-S',
+                    mac: 'Command-S',
+                  sender: 'editor|cli'
+              },
+              exec: function(env, args, request) {
+                 if(dev_code_changed){
+                   save_dev_code_manually();
+                 }else{
+                   showMessage('代码都没有变动，为什么你一直按Ctrl+S， 为什么？');
+                 }
+                }
+              });
+
+              editor.commands.addCommand({
+                  name: 'debugFile',
+                  bindKey: {
+                    win: 'Ctrl-R',
+                    mac: 'Command-R',
+                  sender: 'editor|cli'
+              },
+              exec: function(env, args, request) {
+                 debug_dev_code();
+                }
+              });
+
+              window.setInterval(function(){
+                if(dev_code_changed){
+                  save_dev_code(function(msg){
+                    showMessage('最新代码已自动保存');
+                  });
+                }
+              },10000);
+
+              window.setTimeout(_=>{
+                editor.getSession().setUndoManager(new ace.UndoManager());
+              },1500);
+          });
+        </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>进程日志</title>
+        <%- include('../layout/common-css.html');%>
+        <style type="text/css">
+            #msg{
+                width: 100%;
+                height: 60rem;
+                overflow: auto;
+                background-color:#141414;
+                color:#F8F8F8;
+                font:1.3rem/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd">日志：<em><%=name%></em></h3>
+            </div>
+            <div class="am-panel-bd">
+                <div id="msg"></div>
+            </div>
+            
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+        <script type="text/javascript" src="/js/socket.io-1.3.5.js"></script>
+        <script type="text/javascript">
+            var debug = function(msg){
+                console.log(msg);
+            }
+
+            var log = function(msg){
+                $('#msg').append('<p>'+msg+'</p>');
+                $("#msg").animate({ scrollTop: $('#msg').prop("scrollHeight")}, 1000);
+            }
+
+            $(function(){
+                var dsocket = io('', {
+                    "transports": ['websocket', 'polling'],
+                    'force new connection': true
+                });
+
+                dsocket.on('disconnect', function() {
+                    debug('dsocket disconnect');
+                });
+
+                dsocket.on('reconnect', function() {
+                    brain_validate = false;
+                    debug('dsocket reconnect');
+                });
+
+                dsocket.on('connect', function() {
+                    debug('dsocket connect');
+                    dsocket.emit('join','<%=zone%>');
+                });
+
+                dsocket.on('log', function(data) {
+                    log(data);
+                });
+            });
+        </script>
+</body>
+</html>

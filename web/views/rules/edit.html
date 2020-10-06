@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>编辑数据规则</title>
+        <%- include('../layout/common-css.html');%>
+        <link rel="stylesheet" href="/amazeui/css/amazeui.datetimepicker.css" />
+    </head>
+    <body>
+        <%- include('../layout/header.html');%>
+        <div class="am-panel am-panel-default">
+            <div class="am-panel-hd" style="text-align: center;">
+                    <h3 class="am-panel-bd"><%if(id){%>修改<%}else{%>增加<%}%><%=title%></h3>
+            </div>
+            <div class="am-panel-bd">
+                <form class="am-form" method="post" id="frm" action="<%=uri_prefix%>update<%if(id){%>?id=<%=id%><%}%>">
+                  <input type="hidden" name="referer" value="<%=referer%>"/>
+                  <%if(!id && doc['sid']){%>
+                    <div class="am-form-group">
+                      <label for="name">ID(唯一标识)</label>
+                      <input type="text" name="sid" id="sid" required value="<%=doc['sid']%>" class="am-form-field am-radius" placeholder="数据项唯一标识">
+                    </div>
+                  <%}%>
+                    <div class="am-form-group">
+                      <label for="name">名称</label>
+                      <input type="text" name="name" id="name" required <%if(doc['name']){%>value="<%=doc['name']%>"<%}%> class="am-form-field am-radius" placeholder="给数据项取个名称">
+                    </div>
+                    
+                    <div class="am-form-group am-form-select">
+                      <label for="category" style="display: block;">类别</label>
+                      <select name="category" id="category" data-am-selected>
+                        <%for(let z of data_zone){%>
+                          <optgroup label="<%=z['name']%>">
+                            <%for(let c of z['categories']){%>
+                                <option value="<%=c%>" <%if(doc['category']==c){%> selected<%}%>><%=c%></option>
+                            <%}%>
+                          </optgroup>
+                        <%}%>
+                      </select>
+                    </div>
+
+                    <div class="am-form-group">
+                      <label for="description">描述（数据格式，来源）</label>
+                      <textarea name="description" id="description"><%=doc['description']%></textarea>
+                    </div>
+
+                    <div class="am-form-group">
+                      <label for="schedule_start">调度开始时间</label>
+                      <input type="text" name="schedule_start" id="schedule_start" required <%if(doc['schedule_start']){%>value="<%=doc['schedule_start']%>"<%}%>  class="am-form-field am-radius" placeholder="从什么时候开始调度">
+                    </div>
+                    <div class="am-form-group">
+                      <label for="schedule_peroid">调度周期（单位：秒）</label>
+                      <input type="text" name="schedule_peroid" required id="schedule_peroid" <%if(doc['schedule_peroid']){%>value="<%=doc['schedule_peroid']%>"<%}%>  class="am-form-field am-radius" placeholder="多久抓取一次数据">
+                    </div>
+                    <div class="am-form-group">
+                      <label for="version">数据版本号规则(可使用<a href="/rules/wiki/view/API" target="_blank">魔法变量</a>), 留空则表示根据周期自动产生</label>
+                      <input type="text" name="version" id="version" <%if(doc['version']){%>value="<%=doc['version']%>"<%}%> class="am-form-field am-radius" placeholder="每次抓取数据的版本号规则">
+                    </div>
+                    <div class="am-form-group">
+                      <label class="am-checkbox">有效
+                        <input name="valid" id="valid" type="checkbox" data-am-ucheck value="true" <%if(doc['valid']){%> checked<%}%>>
+                      </label>
+                    </div>
+                    <div class="am-form-group">
+                      <label class="am-checkbox">首屏显示
+                        <input type="checkbox" name="show_desktop" id="show_desktop" data-am-ucheck value="true" <%if(doc['show_desktop']){%> checked<%}%>>
+                      </label>
+                    </div>
+                    <p><button type="submit" class="am-btn am-btn-default">提交</button></p>
+                </form>
+            </div>
+        </div>
+        <%- include('../layout/bottom-js.html');%>
+        <script src="/amazeui/js/amazeui.datetimepicker.min.js"></script>
+        <script type="text/javascript">
+            $('#schedule_start').datetimepicker({
+              format: 'yyyy-mm-dd hh:ii:ss'
+            });
+
+            $(function(){
+              $('#frm').validator({
+                validate: function(validity) {
+                  var v = $(validity.field).val();
+                  if ($(validity.field).is('#sid')) {
+                    validity.valid = false;
+                    return $.ajax({
+                      'url' : 'verify-unique',
+                      'cache' : false,
+                      'dataType' : 'json',
+                      'method' : 'POST',
+                      'data' : {'sid':v}
+                    }).then(function(data) {
+                      validity.valid = data['unique'];
+                      if(!data['unique']){
+                        validity.customError = true;
+                      }else validity.valid = true;
+                      return validity;
+                    }, function() {
+                      validity.customError = true;
+                      return validity;
+                    });
+                  }
+                }
+              });
+            });
+        </script>
+</body>
+</html>

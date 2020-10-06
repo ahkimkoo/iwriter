@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/amazeui/css/amazeui.min.css">
+    <title><%if(id){%>修改<%}else{%>增加<%}%> <%=title%></title>
+    <style type="text/css" media="screen">
+        #editor { 
+            width: 100%;
+            height: 50rem;
+            font-size: 1.6rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="am-panel am-panel-default">
+        <div class="am-panel-hd"><h3 class="am-panel-title"><%if(id){%>修改<%}else{%>增加<%}%> <%=title%></h3></div>
+        <div class="am-panel-bd">
+            <form method="post" class="am-form" action="<%=uri_prefix%>update<%if(id){%>?id=<%=id%><%}%>" id="form" onsubmit="return checkform()">
+                <input type="hidden" name="code" id="code" />
+                <div class="am-form-group">
+                    <input type="button" class="am-btn am-btn-success  am-btn-lg" name="back" value="返回" onclick="window.history.back();"/>
+                </div>
+                <%
+                    for(let f of meta_fields){
+                %>
+                <div class="am-form-group">
+                  <label for="<%=f['key']%>"><%=f['label']%></label>
+                  <input type="text" class="am-form-field am-round" id="<%=f['key']%>" name="<%=f['key']%>" value="<%=doc[f['key']]%>" placeholder="">
+                </div>
+                <%}%>
+
+                <div class="am-form-group">
+                  <label for="language">语言</label>
+                  <select id="language" name="language"  class="am-form-field am-round" >
+                    <%for(let i of languages){%>
+                    <option value="<%=i%>" <%if(doc['language']==i){%>selected="selected"<%}%>><%=i%></option>
+                    <%}%>
+                  </select>
+                  <span class="am-form-caret"></span>
+                </div>
+
+                <div class="am-form-group">
+                    <label>代码</label>
+                    <div id="editor"><%=doc['code']||''%></div>
+                </div>
+
+                <div class="am-form-group">
+                    <input type="submit" class="am-btn am-btn-danger am-btn-lg" name="submit" id="submit" value="提交"/>
+                </div>
+        </div>
+</div>
+<script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/twilight");
+    <%if(doc['language']){%>editor.getSession().setMode("ace/mode/<%=doc['language']%>");<%}%>
+    editor.getSession().setUseWrapMode(true);
+    editor.setHighlightActiveLine(false);
+
+    document.getElementById('language').addEventListener('change',function(){
+        editor.getSession().setMode("ace/mode/"+document.getElementById('language').value);
+    },false);
+
+
+    var checkform = function(){
+        var code = editor.getValue();
+        document.getElementById('code').value = code;
+    }
+</script>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/amazeui/js/amazeui.min.js"></script>
+</body>
+</html>
