@@ -32,7 +32,7 @@
 数据分区是一级大分类，类别是二级分类。分类的目的是数据项变多以后通过分类筛选查看会比较有效，分布式运行时每个进程可以选择一个分区来运行。分区和类别可以通过web后台的编辑动态配置文件进行修改。
 
 
-*项目GIT仓库地址：http://192.168.1.10/repos/intelligent-writer.git*
+*项目GIT仓库地址：https://github.com/ahkimkoo/iwriter.git*
 
 ## 二、运行
 
@@ -212,7 +212,7 @@ option参数说明：
 #### 其他函数
 * sendMail(address, subject, text, html, config={}, sender)
 
-发送邮件，address为收件人地址，列表格式，例如：['"Hero" <hero@feheadline.com>']，subject是邮件标题，text是纯文本内容，html是富文本内容,　config是邮箱服务器配置，举例：
+发送邮件，address为收件人地址，列表格式，例如：['"Hero" <hero@mail.com>']，subject是邮件标题，text是纯文本内容，html是富文本内容,　config是邮箱服务器配置，举例：
 
 ```js
 {
@@ -220,12 +220,12 @@ option参数说明：
     port: 465,
     secure: true,
     auth: {
-        user: 'x@feheadline.com',
+        user: 'x@mail.com',
         pass: 'pass123'
     }
 }
 ```
-sender是发件人，格式：'"Hero" <hero@feheadline.com>'
+sender是发件人，格式：'"Hero" <hero@mail.com>'
 
 * sendMQ(connecturl, exchange, data) 
 
@@ -310,10 +310,10 @@ node dump/dumpall.js -e pro -v dev
 
 * 测试环境
 
-tree/iwriter
+test/iwriter
 
 * 生产环境
-mongodb.feheadline.net/iwriter
+mongodb.server.net/iwriter
 
 ###. 规则维护的整体JSON格式（rules）
 
@@ -497,7 +497,7 @@ bind是绑定一个html元素，将返回内容渲染到指定元素上。
 使用方法：
 在页面源代码引入js代码
 ```html
-<script src="http://user:password＠iw.feheadline.com/provider/show/5ae2ee16f4df240d1ced9f87?version=&bind="></script>
+<script src="http://user:password＠iw.domain.com/provider/show/5ae2ee16f4df240d1ced9f87?version=&bind="></script>
 ```
 
 ## 六、系统架构及扩展性说明

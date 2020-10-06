@@ -10,7 +10,7 @@
 
 ## 第一步：克隆代码
 
-项目GIT地址：https://gitee.com/dreamidea/intelligent-writer
+项目GIT地址：https://github.com/ahkimkoo/iwriter.git
 
 
 ## 第二步：确认setting-pro.json的生产环境mongodb配置正确
